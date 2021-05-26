@@ -1,0 +1,291 @@
+---
+title: "Dumi Research Report 3"
+author: "Dumisani Yambira"
+date: "02/06/2020"
+output:
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+  html_document:
+    self_contained: no
+    toc: yes
+editor_options:
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+```
+# Sections
+## Introduction
+In this Research Report, I intend to investigate the relationship between annual population growth and food imports in African countries. The aim is to find out whether there is a correlation between the increase of population growth in African countries and the increase of food imports in those respective countries. Therefore, given the investigation I have made above, my null hypothesis is that there is no effect between an increase of the population in African countries and food imports whilst my alternative hypothesis is, there exists a relationship between the annual population growth and imports. As such, regarding my variables, the population growth is my independent or grouping variable whilst food imports becomes my dependant variable. In my assumption, statistics indicate that on an average, the population of the African continent continues to grow annually and this is influenced by the majority of the population which falls between 15-64, it means continentally speaking, Africa has a relatively younger population than continents like Europe. In my research, my dataset will be extracted from the World Bank. As I investigate the correlation between my x and y variables, I will also intend to determine whether there exists a causation within the spectrum of the correlation. Hence in addition to my study, I intend to add my control variables of consumer prices and GDP per capita respectively, these will assume the positions of first and second control variables respectively. 
+
+Given the point that my primary area of study is food imports in African countries. My reasons for selecting my x variable, population group is because I want to find out if the food sector is influenced by the growth of population in any given country on the African continent. Its a rule of thumb that everyone needs to eat or consume food in order to survive, be healthy and be productive with other daily tasks like learning or conducting business on a day to day basis. Since my study falls under the criteria of socio-economic, I want to assess whether in relation to the laws of supply and demand, the increase of population causes a demand in food products and therefore in the food sector, it likely causes an increase in food imports as well as a way to meet that demand of the growing population. For the reason that this study is based on a quantitative perspective, my answer will not rush to be conclusive but will be constantly commenting as data is being presented. In addition, the reason for selecting my control variables like consumer prices is because I want to investigate whether the latter influences the food imports in terms of increasing them. An example would be to find out whether the increase of consumer prices will lead to an increase in food imports. In relation to the second control variable, GDP per capita, I want to find out whether there exists a relationship between an increase of GDP per capita and the state of food imports in African countries. In reference to the latter, does an increase in GDP per capita cause a decrease in food imports or vice-versa, or there lies no relationship at all?.
+
+In light of what I have said above, since the paper is based on quantitative data analysis, the reader should be notified that I intend to the general alpha value or significance as 0.05. I will use this to guide me and in conjunction with the given p-value, which I will the latter to determine whether I can reject or accept my null hypothesis. The structure of this paper will start by doing a univariate analysis and will use a density curve because I want to analyse the aggregate outcome of each variable which my research paper intends to assess. For data visualization purposes, I will use ggplot package because it presents data in a simpler and neater way. On this section, univariate analysis, I will be giving a brief analysis of each data presented in the graphs. Thereafter, I will move on to the bivariate analysis where I will generate a correlation matrix I will also generate a scatter plot matrix where I will assess the relationship of all the variables against each other. On the section effect of decomposition,  I will be using regression linear models to generate data and assess the correlations and coefficients between and amongst the variables. Under those regression models, on each regression output generated, I will briefly comment on the p-values on whether there is an effect or no effect at all regarding my y variables and all my other control variables including the x variable as well. I aim to generate a regression table where I will give an outline on whether my variables chosen can be spurious or non-spurious. After this, I will give a final conclusion on the research report where I will either reject or accept the null hypothesis. My aim is to speak on the validity and reliability of my research data on the conclusion section, after the data has already been generated. 
+
+```{r Data setup, echo= FALSE, include=FALSE}
+# Generate my variable
+library(readxl)
+library(GGally)
+library(ggplot2)
+worldbank <- read_excel(path = "Africa Data.xlsx",
+                        col_names = TRUE,
+                        na = " ")
+# arrange my data
+worldbank_cols <- c("year", "year_code", "country_name", "country_code", "population", "food_imports", "consumer_prices", "GDP_per_capita")
+names(worldbank) <- worldbank_cols
+
+worldbank <- worldbank [ ,names(worldbank)!= c("year_code", "country_name")]
+head(worldbank)
+
+#In the code chunk above I decided to rename the column names for easy identification. I also removed some columns which I thought will not be needed in the course of the research project. 
+```
+
+
+## Univariate Analysis
+
+```{r fix my data, echo=FALSE, include=FALSE}
+# change the variables into numeric
+worldbank$population <- as.numeric(as.character(worldbank$population), na.rm= TRUE)
+worldbank$food_imports <- as.numeric(as.character(worldbank$food_imports), na.rm= TRUE)
+worldbank$consumer_prices <- as.numeric(as.character(worldbank$consumer_prices), na.rm=TRUE)
+worldbank$GDP_per_capita <- as.numeric(as.character(worldbank$GDP_per_capita), na.rm=TRUE)
+
+```
+
+```{r Univariate analysis 1, echo=FALSE,}
+#Generate graphs for the variables
+ggplot(worldbank, aes(x=food_imports))+
+  geom_density(color="darkblue", fill="lightblue")
+
+```
+
+
+### Food import graph
+From the graph above, it can be clearly seen that the graph is skewed to the right, meaning it is positive. Since the food_imports measurement has taken taken the x variable, the information from this graph presents that the mode is higher than the mean. This suggests that in terms of importing food in African countries, there are more countries through the merchandise that import 10%-25% of the food consumed or produced. Though the next highest range according to the x- axis is the range of 30 – 35%, the number of African countries which constitute that percentage is approximately 15%. This is presents a significant difference to the majority of about 55% of African countries that prefer to import 10% - 25% of the food consumed and/or produced. 
+
+```{r population, echo= FALSE}
+#ggplot for population
+ggplot(worldbank, aes(x=population))+
+  geom_density(color="darkblue", fill="lightblue")
+
+```
+
+
+### Population
+The above density plot presents a negatively skewed graph. By the look of this graph, it can be suggested that close to 80% of the African countries in my dataset amalgamate to an average annual increase of about 2.5% of their continental population. This supports the claim I made earlier on in my introduction that Africa had a fast growth rate of the population.
+
+```{r log population, echo= FALSE, include=FALSE}
+qplot(log(population), data = worldbank, geom = "density", na.rm= TRUE, xlab = "population", ylab = "density")+
+  geom_density(colour= "black", fill="lightblue")
+```
+
+
+
+
+```{r GDP_per_capita, echo= FALSE}
+#ggplot for GDP per capita
+ggplot(worldbank, aes(x=GDP_per_capita))+
+  geom_density(color="black", fill="lightgreen")
+```
+
+
+### GDP per capita
+The graph presents a GDP per Capita of the African countries. Unfortunately, though the data appears to be positively skewed, it is difficult to interpret as there is not sufficient information to comment on. Therefore, this measurement will be logged so as to give better representation of data, the other reason is, the y-axis decimal form is difficult to interpret as well so will continue with logging the data and generate another one. 
+ 
+
+```{r log GDP per capita, echo=FALSE}
+#log my data inorder to come up with a better representation of data visualization
+qplot(log(GDP_per_capita), data = worldbank, geom = "density", na.rm= TRUE, xlab = "GDP_per_capita", ylab = "density") +
+  geom_density(color= "black", fill="lightgreen")
+
+```
+
+
+### GDP per capita log
+After logging the data, the graph now appears more informed. From the shape itself, the graph is positively skewed. The problem presented by this graph is that, the original units of measurement along the GDP_per_capita axis have been changed. However, from the given units in the graph on the x-axis, will assume that the central value lies between 8 and 9 on the x-axis to make it 8.5. By using this method, it can therefore be deduced that the majority of the GDP per capita lie below the central value of 8.5. This suggests that many African countries have a somewhat low to low middle income as is presented by the data. As the graph moves to the right, it can be seen that few African countries have a GDP per capita that surpasses the central value. The distribution is uni-modal. 
+
+
+```{r inflation, echo= FALSE}
+#ggplot for inflation
+ggplot(worldbank, aes(x=consumer_prices))+
+  geom_density(color="black", fill="lightgreen")
+
+```
+
+
+### Consumer prices
+The presentation of the graph clearly indicates that there little information to discuss upon and therefore, I will log the data in order to get more information. 
+
+
+```{r log consumer prices, echo= FALSE}
+#log for my consumer price graph
+qplot(log(consumer_prices), data = worldbank, geom = "density", na.rm= TRUE, xlab = "consumer prices", ylab = "density")+
+  geom_density(color= "black", fill= "lightgreen")
+```
+
+
+### Consumer prices
+The graph after being logged presents a symmetrical sharp and it can be classified as a normal distribution. This is because the graph corresponds with the central value line as presented on the x-axis. Hence, the average of the consumer prices in African countries is reasonable in terms of power purchasing parity. This means the food prices in the majority of African states can be afforded though the GDP per capita indicates that it is relatively low, this graph outlines that inflation prices are reasonable in the African states. Though there is a normal distribution, it is important to indicate the existence of the outliers as presented in the graph. With a range of -2 to 6, it shows that there are countries that are experiencing a deflation and this reduces demand and slows down growth whilst on the 6 scale, there are those that are experiencing hyperinflation, meaning there is more demand of goods but most likely supply of less goods or the power purchasing parity of those respective countries is losing value.
+
+
+## Bivariate Analysis
+In this section, I will run a correlation matrix of between the variables in order to understand the association between and amongst the variables. I will first generate a correlation between the dependent and the independent variable. After generating the matrix, I intend to create a scatterplot.
+
+```{r correlation matrixbetween dependant and independant variable, echo= FALSE}
+# come up with correlation matrix then make a scatter plot after that
+worldbank_cor <- cor(worldbank[, c("population", "food_imports", "GDP_per_capita", "consumer_prices")], use = "complete.obs")
+
+round(worldbank_cor, 2)
+```
+
+
+The correlation matrix contains a majority of negative values, suggesting that there is a possibility of the control variables having an inverse relationship with the variable under study, food imports. 
+
+
+```{r plot between dependant and independant variable, echo=FALSE}
+# create a plot
+plot(worldbank$population, worldbank$food_imports, main = "Measuring food imports",
+     xlab = "population", ylab = "food imports")
+abline(lm(food_imports ~ population, data = worldbank), col = "red")
+
+```
+
+
+### Scatter plot
+As is presented in the scatter plot, I have added a regression line in order to determine the relationship between the x and the y variable. From the presentation, the regression line informs us that there is an inverse relationship, though it is not strong. In addition to the periodization which is in the dataset, it can be seen that the majority of countries with a population that has a higher annual growth prefer to import food at about 10-20%. On the other hand, the top half of the scatter plot indicates that there are a significant number of countries that have imported food at a higher percentage through the period of 8 years according to the study. Focusing on the top half, there are various data points that are scattered further indicating how spread out the data is. It should be noted that there are outliers as well in the data presented. Nevertheless, because the darker concentration of the data points lie below the regression line, it can be suggested that the annual increase of population growth does not directly result in the increase of food imports. 
+
+
+```{r plot with ggplot, echo=FALSE}
+library(ggplot2)
+ggplot(worldbank, aes(x = population, y = food_imports, na.rm= TRUE, color = "red",
+                      label =country_name)) +
+   geom_point() +
+   geom_text(aes(label=ifelse(food_imports>35, as.character(country_name),'')),hjust=0,vjust=0)
+
+```
+
+
+### Ggplot
+I furthermore constructed a ggplot scatter-plot with text function included in order to understand which countries had a higher percentage rate of importing food across the 8 years in my dataset. From the plot, I decided to identify the countries that imported food higher than 35%. The reason why I took this decision is because had I decided to do all the countries, the graph would not appear neatly since there are many data points that are clustered. That being said, from the scatter-plot, one can see that there is a repetition of countries that have a higher rate of importing food these are, Benin, Gambia, Comoros and Central African Republic. The countries which feature more like Benin, Gambia and Comoros appear to have an annual growth rate of 2.5 in their respective populations. Though as far as these countries are concerned, it cannot be concluded that their high annual population growth as caused them to import more food. There could be underlying reasons which are not part of this study that might have caused these countries to import more food. 
+
+
+```{r ggplot of the timeline, echo= FALSE}
+#compare a timeline of the same graph
+ggplot(worldbank, aes(x = population, y = food_imports, na.rm= TRUE, color = "red",
+                      label =year)) +
+   geom_point() +
+   geom_text(aes(label=ifelse(food_imports>24,as.character(year),'')),hjust=0,vjust=0)
+
+```
+
+
+### Ggplot with years
+I also went further to put the timeline on data points so that I know which particular years the previous countries I managed were consistent in maintaining high imports of food. Looking at the countries, like Central African Republic which imported food higher than 35%, it had only one case were that occurred. Then focusing on Benin which featured four times on the previous list, it can be seen that it continued to import food higher than 35% for the years 2013, 2014, 2016 & 2017. Benin can / is an outlier in terms of the relationship between imports and population. Where we see that there lies a correlation of an increase in population growth and an increase in food imports, though I cannot conclude that correlation results in the specific causation.
+
+
+```{r assessing the distribution of food imports throughout time, eval=FALSE, include=FALSE}
+#run a scatterplot to assess the timeline distribution of food imports 
+plot(worldbank$year, worldbank$food_imports)
+```
+It can be seen that from the dotplot presented above, the majority of African countries were not importing much from food for either retail or housing consumption. This is suggested by the presentation of the average cluster of food import data being below average. Though there are some outliers in each given year assessing food import data, one can assume that the ratio of people consuming local African food is higher than consuming imported food.
+
+```{r scatterplot creation, echo= FALSE, message=FALSE}
+# create a scatter plot matrix for my variables
+library(GGally)
+ggpairs(worldbank, columns = c("population", "food_imports", "consumer_prices", "GDP_per_capita"),upper = list(continuous = wrap('cor', size = 8, na.rm= TRUE)))
+
+```
+
+
+### Scatter-plot Matrix
+In assessing the correlation matrix of the variables I will outline them variable by variable.
+
+
+1. Population ~ food imports
+
+There is a negative correlation and suggests that there is a higher probability that the annual population growth means that there is a decrease in food imports. This is not to conclude that there is a causation but it gives the outcome that the results generate an inverse relationship between the two variables. From the result, the value generated is closer to zero and even in the spectrum of negative correlation, the association is weak. 
+
+2. Consumer prices ~ population
+
+As presented in the plot. Populations that had a higher annual growth has consumer prices that were low. The correlation between the two variables is negative but not strong, rather weak. 
+
+3. GDP per capita ~ population
+
+On this plot, the negative correlation between these two variables is the strongest as presented in the plot. This suggests to say that countries that had a GDP per capita above 1000 were associated with countries that had an annual growth of 1.5% or more. Though there are outliers, it can be seen that the majority of the countries under the 1000 benchmark continued were associated with those countries that have an annual growth rate of 2.5%. 
+
+4. GDP per capita ~ food imports
+
+Here, countries that are below the 1000 benchmark were associated with countries that imported 10-30% of the food. We can only see a few countries that have a GDP per capita of 2000 which import 20-30% of the food in their respective territories. 
+
+5. Consumer prices ~ food imports
+
+The association between the consumer prices and food imports according to the plot is weak. The problem is that it is difficult to log the consumer price data on a plot. 
+
+
+## Effect of decomposition
+
+### lm
+The coefficient is negative and therefore indicates that regarding this relationship, as the independent increases, there is a probability that the dependant decreases. The p-value of 0.18 can be considered to be statistically significant since its under the alpha value of 0.05
+
+```{r bivariate regression between, echo= FALSE}
+# bivariate regression for x and y
+lm <- lm(food_imports~ population, data = worldbank)
+summary(lm)
+```
+
+
+
+### lm2
+The introduction of the consumer prices as a control variable has weakened the negative correlation between population and food imports. This is because the data as shown earlier on consumer prices is not significant unless it is logged. This is because the data of consumer prices has a weak association with either food imports or population and it has resulted why the population coefficient is reduced. Regarding the p-value which is 0.09, it can be concluded that it is statistically insignificant because it surpass the alpha value. 
+
+```{r three variable multi-regression, echo=FALSE}
+# generate a three variable multi-regression for x, y and c1
+lm2 <- lm(food_imports ~ consumer_prices + population, data = worldbank)
+summary(lm2)
+
+```
+
+
+### lm3
+The GDP per capita has strengthened the negative coefficient of the population variable. This might be alluded to the idea that GDP has a stronger association with the population data. In assessing the inverse relationship, GDP per capita strengthens the relationship. The p-value is 0.03, statistically it can be accepted because it is less than the alpha value
+
+
+```{r three multivariate regression that includes c2, echo=FALSE}
+#run a three multivariate regression that includes c2 and excludes c1
+lm3 <- lm(food_imports~ GDP_per_capita + population, data= worldbank)
+summary(lm3)
+```
+
+
+### lm4
+The population coefficient remains negatively strong when all the independent variables are regressed.
+
+
+```{r four multivariate regression that includes all variables, echo=FALSE}
+# generate a four multivariate regression
+lm4 <- lm(food_imports ~ consumer_prices + GDP_per_capita + population, data= worldbank)
+summary(lm4)
+```
+
+
+### Regression table
+
+```{r regression table, echo= FALSE, results= "asis"}
+# create a regression table
+library(stargazer)
+independant_names <- c("Inflation consumer price", "GDP per capita(PPP)", "Population annual growth")
+
+stargazer(lm, lm2, lm3, lm4, type = "html", df= FALSE, covariate.labels = independant_names, dep.var.labels = "Food imports, 2011-2017")
+  
+```
+
+
+From the regression table, since I have explained other statistical results like coefficients and correlations, I will comment on the state of the p-value. As noted above, the p-value is less than the Alpha level and therefore we can reject the null hypothesis as the overall p-value is 0.04
+
+## Conclusion
+In conclusion, as presented by the data, the null hypothesis has been rejected as the p-value is low than the significance level of 0.05. Hence by rejecting the null hypothesis, the alternative hypothesis can be adopted which states that annual population growth has an effect on food imports in African countries. However, though the p-value is rejected, it cannot be described as strong evidence since the p-value is closer to the 0.05. Despite the data indicating a negative correlation, it can be concluded the inverse relationship resembles a weaker association rather than a strong one. Therefore, the results of the data indicate a spurious relationship more than a non-spurious as presented by the data. Though the results are valid, I cannot conclude them to be reliable because of the weaker evidence we see in relation to the p-value. 
+
+
